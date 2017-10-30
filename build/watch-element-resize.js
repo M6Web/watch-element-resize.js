@@ -1,8 +1,8 @@
 /**
  * A (yet another) cross-browser, event-based, element resize watcher.
- * https://github.com/jonataswalker/watch-element-resize.js
- * Version: v2.0.1
- * Built: 2016-10-07T17:50:10-03:00
+ * https://github.com/M6Web/watch-element-resize.js
+ * Version: v2.0.6
+ * Built: 
  */
 
 (function (global, factory) {
@@ -258,18 +258,20 @@ Internal.prototype.scrollListener = function scrollListener (evt) {
   var this_ = this;
   var element = evt.target.parentNode.parentNode;
 
-  this_.resetTriggers(element);
-  if (element.__resizeRAF__) { utils.cancelFrame(element.__resizeRAF__); }
+  if (element.__resizeTriggers__) {
+    this_.resetTriggers(element);
+    if (element.__resizeRAF__) { utils.cancelFrame(element.__resizeRAF__); }
 
-  element.__resizeRAF__ = utils.requestFrame(function () {
-    if (this_.checkTriggers(element)) {
-      element.__resizeLast__.width = element.offsetWidth;
-      element.__resizeLast__.height = element.offsetHeight;
-      element.__resizeListeners__.forEach(function () {
-        this_.trigger(element);
-      });
-    }
-  });
+    element.__resizeRAF__ = utils.requestFrame(function () {
+      if (this_.checkTriggers(element)) {
+        element.__resizeLast__.width = element.offsetWidth;
+        element.__resizeLast__.height = element.offsetHeight;
+        element.__resizeListeners__.forEach(function () {
+          this_.trigger(element);
+        });
+      }
+    });
+  }
 };
 
 Internal.prototype.addResizeListener = function addResizeListener (element) {
@@ -296,12 +298,16 @@ Internal.prototype.addResizeListener = function addResizeListener (element) {
 
     /* Listen for a css animation to detect element display/re-attach */
     if (this.animation.startevent) {
-      element.__resizeTriggers__.addEventListener(this.animation.startevent,
-        function (e) {
-          if (e.animationName === this.animation.name) {
-            this_.resetTriggers(element);
-          }
-        });
+      element.__resizeTriggers__.animationStartListener = function (e) {
+        if (e.animationName === this.animation.name) {
+          this_.resetTriggers(element);
+        }
+      };
+
+      element.__resizeTriggers__.addEventListener(
+        this.animation.startevent,
+        element.__resizeTriggers__.animationStartListener
+      );
     }
   }
   // FIXME what to do with this thing?
@@ -313,6 +319,14 @@ Internal.prototype.removeResizeListener = function removeResizeListener (element
     element.__resizeListeners__.indexOf(element._id), 1);
   if (!element.__resizeListeners__.length) {
     element.removeEventListener('scroll', this.handleScrollListener);
+
+    if (this.animation.startevent) {
+      element.__resizeTriggers__.removeEventListener(
+        this.animation.startevent,
+        element.__resizeTriggers__.animationStartListener
+      );
+    }
+
     element.__resizeTriggers__ =
       !element.removeChild(element.__resizeTriggers__);
   }
@@ -354,17 +368,19 @@ Internal.prototype.createStyles = function createStyles () {
 };
 
 Internal.prototype.resetTriggers = function resetTriggers (element) {
-  var triggers = element.__resizeTriggers__,
-      expand = triggers.firstElementChild,
-      contract = triggers.lastElementChild,
-      expandChild = expand.firstElementChild;
+  if (element.__resizeTriggers__) {
+    var triggers = element.__resizeTriggers__,
+        expand = triggers.firstElementChild,
+        contract = triggers.lastElementChild,
+        expandChild = expand.firstElementChild;
 
-  contract.scrollLeft = contract.scrollWidth;
-  contract.scrollTop = contract.scrollHeight;
-  expandChild.style.width = expand.offsetWidth + 1 + 'px';
-  expandChild.style.height = expand.offsetHeight + 1 + 'px';
-  expand.scrollLeft = expand.scrollWidth;
-  expand.scrollTop = expand.scrollHeight;
+    contract.scrollLeft = contract.scrollWidth;
+    contract.scrollTop = contract.scrollHeight;
+    expandChild.style.width = expand.offsetWidth + 1 + 'px';
+    expandChild.style.height = expand.offsetHeight + 1 + 'px';
+    expand.scrollLeft = expand.scrollWidth;
+    expand.scrollTop = expand.scrollHeight;
+  }
 };
 
 Internal.prototype.checkTriggers = function checkTriggers (element) {
