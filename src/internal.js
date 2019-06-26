@@ -218,7 +218,7 @@ export class Internal {
       '.resize-triggers, .resize-triggers > div,',
       '.contract-trigger:before { content: " ";display:block;',
       'position:absolute;top:0;left:0;height:100%;width:100%;overflow:hidden;}',
-      '.resize-triggers>div{background:#eee;overflow:auto;}',
+      '.resize-triggers>div{background:#eee;}',
       '.contract-trigger:before{width:200%;height:200%;}'
     ].join('');
 

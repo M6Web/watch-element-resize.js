@@ -1,6 +1,6 @@
 {
   "name": "watch-element-resize",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "A (yet another) cross-browser, event-based, element resize watcher.",
   "main": "build/watch-element-resize.min.js",
   "browser": "build/watch-element-resize.min.js",

@@ -1,7 +1,7 @@
 /**
  * A (yet another) cross-browser, event-based, element resize watcher.
  * https://github.com/M6Web/watch-element-resize.js
- * Version: v2.0.6
+ * Version: v2.0.7
  * Built: 
  */
 
@@ -347,7 +347,7 @@ Internal.prototype.createStyles = function createStyles () {
     '.resize-triggers, .resize-triggers > div,',
     '.contract-trigger:before { content: " ";display:block;',
     'position:absolute;top:0;left:0;height:100%;width:100%;overflow:hidden;}',
-    '.resize-triggers>div{background:#eee;overflow:auto;}',
+    '.resize-triggers>div{background:#eee;}',
     '.contract-trigger:before{width:200%;height:200%;}'
   ].join('');
 
